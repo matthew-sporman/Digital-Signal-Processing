@@ -1,0 +1,88 @@
+Week of 09/22:
+Here's the things we want to do with this data:
+
+1. Have a script we can give timedate strings to and have it segment out (possibly combining) a chunk every N minutes (plan on 12, but it might change) from the .wav files.
+
+--------------------------------------------------------------------------------------------------------------------
+
+2. Process out some signal statistics. I'll add to this later
+
+2a. Spectrum - 
+
+2b. Overall levels - 
+
+2c. Filtered levels - match the paper
+
+--------------------------------------------------------------------------------------------------------------------
+
+3. Load the other parameters we see in the below .png and try to correlate things with the spectra
+
+--------------------------------------------------------------------------------------------------------------------
+
+Here's the github for the SWIFT buoy processing, linked to the hydrophone part (It's in MATLAB!): 
+https://github.com/SASlabgroup/SWIFT-codes/tree/master/Hydrophone
+
+
+-------------------------------------------------------------------------------------------------------------------
+Week of 09/29:
+Here's the part to mimic in Python:
+     % compute spectra (really spectrogram, time+freq)
+            [~,f_Hz,~,psd] = spectrogram(data_T,fs,0,fs,fs,'psd');
+   
+            % convert to dB
+            psd_db = 10*log10(psd)+gain; %in dB, adding the gain
+           
+            % find median values (avoids spiking)
+            mS = median(psd_db,2,'omitnan');
+               
+            % decimate to reduce frequency resolution
+            f_kHz = decimate(f_Hz, 100)./1000;
+            mS = decimate(mS, 100);
+    
+
+from: https://github.com/SASlabgroup/SWIFT-codes/blob/master/Hydrophone/add_SNP.m
+
+should be same as; https://github.com/SASlabgroup/SWIFT-codes/blob/master/Hydrophone/SNAP_hydrophone_processing.m
+
+check sample rate, might be 96 kHz, should be available when you load the wav file.
+
+--------------------------------------------------------------------------------------------------------------------
+
+Important things to compute:
+
+- 1-20 kHz overall level
+Two steps:
+1. Apply filter (either high & low OR band pass filter)
+from scipy.signal import butter, filtfilt
+# Butterworth filter parameters
+order = 4
+cutoff_freq = 100  # Hz - UPDATE THIS
+btype = 'lowpass' # UPDATE THIS
+nyquist_freq = 0.5 * fs
+normalized_cutoff = cutoff_freq / nyquist_freq
+b, a = butter(order, normalized_cutoff, btype=btype, analog=False)
+filtered_signal = filtfilt(b, a, original_signal)
+
+--------------------------------------------------------------------------------------------------------------------
+
+2. Compute root mean square level
+Square all values, take mean along time axis, square root that value. Maybe convert to decibels after (20(log10(pressure in pascals/(10^-6 pascals))
+
+
+- Spectra
+from scipy.signal import welch
+frequencies, psd = welch(signal, fs, nperseg=256, noverlap=128)
+
+We should update nperseg and noverlap. Keep noverlap at nperseg/2. Try some different things, but don't go over sampling frequency. Try 1024, 2048, etc.
+
+Reference for windowing: https://download.ni.com/evaluation/pxi/Understanding%20FFTs%20and%20Windowing.pdf
+
+--------------------------------------------------------------------------------------------------------------------
+SAVE FOR LATER
+      |
+      V
+
+- Ambient levels at: 
+ - 1.5 kHz
+ - 7.5 kHz
+ - 15 kHz
