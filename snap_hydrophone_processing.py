@@ -17,7 +17,7 @@ nperseg = 2048
 noverlap = nperseg // 2
 # --------------------------------
 
-save_path = r"D:\SWIFT12_hydrophone\ProcessedResults"
+save_path = r"D:\SWIFT12_hydrophone\2024-10\ProcessedResults"
 os.makedirs(save_path, exist_ok=True)
 
 # Finds the WAV files
