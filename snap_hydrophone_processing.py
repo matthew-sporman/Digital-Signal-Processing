@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 import matplotlib.dates as mdates
 
 # -------- USER SETTINGS -------- #
-wav_folder = r"D:\SWIFT12_hydrophone\2024-10"  # Path to folder with .wav files
+wav_folder = r"D:\SWIFT12_hydrophone\2024-10\output_segments"  # Path to folder with .wav files
 lowcut = 1000    # 1 kHz
 highcut = 20000  # 20 kHz
 filter_order = 4  # Butterworth filter order
@@ -25,8 +25,10 @@ wav_files = [f for f in os.listdir(wav_folder) if f.lower().endswith(".wav")]
 if not wav_files:
     raise FileNotFoundError(f"No .wav files found in {wav_folder}")
 
+# --- Lists to store data ---
 PSD_list = []
-time_list = []
+segment_time_list = []         # For spectrogram (Welch segment timestamps)
+file_level_time_list = []      # For overall RMS level plot
 overall_levels_db = []
 
 # --- Bandpass filter ---
@@ -62,7 +64,7 @@ for file_name in sorted(wav_files):
     rms_level = np.sqrt(np.mean(filtered_data**2))
     overall_level_db = 20 * np.log10(rms_level + np.finfo(float).eps)
     overall_levels_db.append(overall_level_db)
-    time_list.append(timestamp)
+    file_level_time_list.append(timestamp)
     print(f"Overall 1–20 kHz level: {overall_level_db:.2f} dB (relative)")
 
     # --- Compute Welch per overlapping segment for smooth spectrogram ---
@@ -82,11 +84,11 @@ for file_name in sorted(wav_files):
 
         # Timestamp for this segment
         t_seg = timestamp + timedelta(seconds=(i*step)/fs)
-        time_list.append(t_seg)
+        segment_time_list.append(t_seg)
 
 # --- Converts lists to arrays ---
 PSD = np.array(PSD_list).T  # frequency x time
-time_array = np.array(time_list)
+time_array = np.array(segment_time_list)
 f_kHz = f[freq_mask] / 1e3
 overall_levels_db = np.array(overall_levels_db)
 
@@ -98,6 +100,10 @@ output_name = os.path.join(save_path, "SNAPhydrophonespectra_fft")
 np.savez(f"{output_name}.npz", f_kHz=f_kHz, PSD=PSD, median_PSD=median_PSD,
          time=time_array, overall_levels_db=overall_levels_db)
 print(f"\n✅ Saved processed data to {output_name}.npz")
+
+# --- Print dimensions of the spectrogram data ---
+print("Spectrogram plot dimensions:")
+print(f"  PSD shape: {PSD.shape} (freq x time)")
 
 # --- Plot spectrogram ---
 plt.figure(figsize=(10, 6))
@@ -130,7 +136,7 @@ plt.close()
 
 # --- Plot overall Root Mean Square (RMS) over time ---
 plt.figure(figsize=(8, 4))
-time_nums = mdates.date2num(time_array[:len(overall_levels_db)])  # use only one timestamp per file
+time_nums = mdates.date2num(file_level_time_list)  # use only one timestamp per file
 plt.plot(time_nums, overall_levels_db, marker='o')
 plt.xlabel("Time (UTC)")
 plt.ylabel("Overall 1–20 kHz Level (dB, relative)")
