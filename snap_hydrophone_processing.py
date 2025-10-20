@@ -27,11 +27,11 @@ if not wav_files:
 
 # --- Lists to store data ---
 PSD_list = []
-segment_time_list = []         # For spectrogram (Welch segment timestamps)
+segment_time_list = []         # For spectrogram -> Welch segment timestamps
 file_level_time_list = []      # For overall RMS level plot
 overall_levels_db = []
 
-# --- Bandpass filter ---
+# --- Applied bandpass filter ---
 def butter_bandpass_filter(data, lowcut, highcut, fs, order=4):
     nyquist = 0.5 * fs
     low = lowcut / nyquist
@@ -39,7 +39,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=4):
     b, a = butter(order, [low, high], btype='band')
     return filtfilt(b, a, data)
 
-# --- Process each WAV file ---
+# --- Processes each WAV file ---
 for file_name in sorted(wav_files):
     file_path = os.path.join(wav_folder, file_name)
     print(f"Processing {file_name}...")
@@ -53,100 +53,134 @@ for file_name in sorted(wav_files):
         continue
 
     # Read audio
-    fs, data = wavfile.read(file_path)
-    if data.ndim > 1:
-        data = data[:, 0]
-    data = data.astype(np.float64)
+    try:
+        fs, data = wavfile.read(file_path)
 
+        # --- Normalize WAV data to ±1 ---
+        if data.ndim > 1:
+            data = data[:, 0]  # take first channel if stereo
+
+        if data.dtype == np.int16:
+            data = data / 32768.0
+        elif data.dtype == np.int32:
+            data = data / 2147483648.0
+        elif data.dtype == np.uint8:
+            data = (data - 128) / 128.0
+        elif data.dtype in [np.float32, np.float64]:
+            pass  # already float
+        data = data.astype(np.float64)
+
+    except Exception as e:
+        print(f"⚠️ Failed to read {file_name}: {e}")
+        continue  # skips this file
+
+    # Step 1: Filtering (1–20 kHz)
     filtered_data = butter_bandpass_filter(data, lowcut, highcut, fs, order=filter_order)
 
-    # --- Compute overall Root Mean Square (RMS) for the entire file ---
+     # Step 2: RMS level
+    # --- Squares all values, takes mean + sqrt, then converts to dB. ---
+    hydrophone_sensitivity_db = -170 # TO BE CHANGED with actual hydrophone sensitivity
     rms_level = np.sqrt(np.mean(filtered_data**2))
-    overall_level_db = 20 * np.log10(rms_level + np.finfo(float).eps)
+    overall_level_db = 20 * np.log10(rms_level + np.finfo(float).eps) - hydrophone_sensitivity_db
     overall_levels_db.append(overall_level_db)
     file_level_time_list.append(timestamp)
-    print(f"Overall 1–20 kHz level: {overall_level_db:.2f} dB (relative)")
+    print(f"Overall 1–20 kHz level: {overall_level_db:.2f} dB re 1 µPa")
 
     # --- Compute Welch per overlapping segment for smooth spectrogram ---
     step = nperseg - noverlap
     num_segments = (len(filtered_data) - noverlap) // step
 
     for i in range(num_segments):
-        segment = filtered_data[i*step : i*step + nperseg]
+        # Extract a segment of data for this Welch calculation
+        segment = filtered_data[i * step : i * step + nperseg]
         if len(segment) < nperseg:
             continue
-        f, psd = welch(segment, fs=fs, nperseg=nperseg, noverlap=0, scaling='density')
-        psd_db = 10 * np.log10(psd + np.finfo(float).eps)
+
+        # --- Step 3: Spectra / Spectrogram (per segment) ---
+        f, psd = welch(segment, fs=fs, nperseg=nperseg, noverlap=noverlap, scaling='density')
+
+        # Convert PSD to dB and apply hydrophone sensitivity
+        psd_db = 10 * np.log10(psd + np.finfo(float).eps) - hydrophone_sensitivity_db
 
         # Keep only 1–20 kHz
-        freq_mask = (f >= lowcut) & (f <= highcut)
+        if 'freq_mask' not in locals():
+            freq_mask = (f >= lowcut) & (f <= highcut)
         PSD_list.append(psd_db[freq_mask])
 
         # Timestamp for this segment
-        t_seg = timestamp + timedelta(seconds=(i*step)/fs)
+        t_seg = timestamp + timedelta(seconds=(i * step) / fs)
         segment_time_list.append(t_seg)
 
 # --- Converts lists to arrays ---
-PSD = np.array(PSD_list).T  # frequency x time
-time_array = np.array(segment_time_list)
-f_kHz = f[freq_mask] / 1e3
-overall_levels_db = np.array(overall_levels_db)
+if PSD_list:
+    PSD = np.array(PSD_list).T  # frequency x time
+    time_array = np.array(segment_time_list)
+    overall_levels_db = np.array(overall_levels_db)
 
-# --- Compute median Power Spectral Density (PSD) across all files ---
-median_PSD = np.median(PSD, axis=1)
+    f_kHz = f[freq_mask] / 1e3  # Computes freq_mask only once
 
-# --- Save processed data ---
-output_name = os.path.join(save_path, "SNAPhydrophonespectra_fft")
-np.savez(f"{output_name}.npz", f_kHz=f_kHz, PSD=PSD, median_PSD=median_PSD,
-         time=time_array, overall_levels_db=overall_levels_db)
-print(f"\n✅ Saved processed data to {output_name}.npz")
+    # --- Compute median Power Spectral Density (PSD) across all files ---
+    median_PSD = np.median(PSD, axis=1)
 
-# --- Print dimensions of the spectrogram data ---
-print("Spectrogram plot dimensions:")
-print(f"  PSD shape: {PSD.shape} (freq x time)")
+    # --- Save processed data ---
+    output_name = os.path.join(save_path, "SNAPhydrophonespectra_fft")
+    np.savez(f"{output_name}.npz", f_kHz=f_kHz, PSD=PSD, median_PSD=median_PSD,
+             time=time_array, overall_levels_db=overall_levels_db)
+    print(f"\n✅ Saved processed data to {output_name}.npz")
 
-# --- Plot spectrogram ---
-plt.figure(figsize=(10, 6))
-plt.pcolormesh(time_array, f_kHz, PSD, shading="auto")
-plt.xlabel("Time (UTC)")
-plt.ylabel("Frequency [kHz]")
-plt.title("Hydrophone Spectrogram (1–20 kHz, Welch per window)")
-plt.colorbar(label="Power (dB, relative)")
-plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-plt.gcf().autofmt_xdate()
-plt.tight_layout()
-plt.savefig(os.path.join(save_path, "spectrogram.png"), dpi=200)
-plt.close()
+    # --- Print dimensions of the spectrogram data ---
+    print("Spectrogram plot dimensions:")
+    print(f"  PSD shape: {PSD.shape} (freq x time)")
 
-# --- Decimate median Power Spectral Density (PSD) ---
-dec_factor = 100
-median_PSD_dec = decimate(median_PSD, dec_factor)
-f_kHz_dec = decimate(f_kHz, dec_factor)
+    # --- Plot spectrogram ---
+    plt.figure(figsize=(10, 6))
+    plt.pcolormesh(time_array, f_kHz, PSD, shading="auto")
+    plt.xlabel("Time (UTC)")
+    plt.ylabel("Frequency (kHz)")
+    plt.title("Spectrogram (1–20 kHz)")
+    plt.colorbar(label="Power (dB re 1 µPa²/Hz)")
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+    plt.gcf().autofmt_xdate()
+    plt.tight_layout()
+    plt.savefig(os.path.join(save_path, "spectrogram.png"), dpi=200)
+    plt.close()
 
-# --- Plot median Power Spectral Density (PSD) ---
-plt.figure(figsize=(8, 6))
-plt.plot(f_kHz_dec, median_PSD_dec, color='red')
-plt.xlabel("Frequency [kHz]")
-plt.ylabel("Power (dB, relative)")
-plt.title("Median PSD (1–20 kHz, Welch, decimated)")
-plt.grid(True, which="both")
-plt.tight_layout()
-plt.savefig(os.path.join(save_path, "median_psd_decimated.png"), dpi=200)
-plt.close()
+    # Step 5: Decimation (Power Spectral Density)
+    dec_factor = 100
+    if len(median_PSD) > dec_factor:
+        median_PSD_dec = decimate(median_PSD, dec_factor)
+        f_kHz_dec = decimate(f_kHz, dec_factor)
+    else:
+        median_PSD_dec = median_PSD
+        f_kHz_dec = f_kHz
 
-# --- Plot overall Root Mean Square (RMS) over time ---
-plt.figure(figsize=(8, 4))
-time_nums = mdates.date2num(file_level_time_list)  # use only one timestamp per file
-plt.plot(time_nums, overall_levels_db, marker='o')
-plt.xlabel("Time (UTC)")
-plt.ylabel("Overall 1–20 kHz Level (dB, relative)")
-plt.title("Hydrophone Overall Level (1–20 kHz)")
-plt.grid(True)
-plt.gca().xaxis_date()
-plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-plt.gcf().autofmt_xdate()
-plt.tight_layout()
-plt.savefig(os.path.join(save_path, "overall_levels_over_time.png"), dpi=200)
-plt.close()
+    # --- Plot median Power Spectral Density (PSD) ---
+    plt.figure(figsize=(8, 6))
+    plt.plot(f_kHz_dec, median_PSD_dec, color='red')
+    plt.xlabel("Frequency (kHz)")
+    plt.ylabel("Power (dB re 1 µPa²/Hz)")
+    plt.title("Median Power Spectral Density (1–20 kHz)")
+    plt.grid(True, which="both")
+    plt.tight_layout()
+    plt.savefig(os.path.join(save_path, "median_psd_decimated.png"), dpi=200)
+    plt.close()
 
-print(f"✅ Saved plots to {save_path}")
+    # --- Plot overall RMS over time ---
+    plt.figure(figsize=(8, 4))
+    time_nums = mdates.date2num(file_level_time_list)
+    plt.plot(time_nums, overall_levels_db, marker='o')
+    plt.xlabel("Time (UTC)")
+    plt.ylabel("Overall 1–20 kHz Level (dB re 1 µPa)")
+    plt.title("Hydrophone Overall Level (1–20 kHz)")
+    plt.grid(True)
+    plt.gca().xaxis_date()
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+    plt.gcf().autofmt_xdate()
+    plt.tight_layout()
+    plt.savefig(os.path.join(save_path, "overall_levels_over_time.png"), dpi=200)
+    plt.close()
+
+    print(f"✅ Saved plots to {save_path}")
+
+else:
+    print("⚠️ No valid PSD data to process.")
