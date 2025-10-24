@@ -77,6 +77,10 @@ We should update nperseg and noverlap. Keep noverlap at nperseg/2. Try some diff
 
 Reference for windowing: https://download.ni.com/evaluation/pxi/Understanding%20FFTs%20and%20Windowing.pdf
 
+
+Splitting: 
+Hydrophone data may need to be synchronized with meteorlogical data (OFFSET)!!!
+
 --------------------------------------------------------------------------------------------------------------------
 SAVE FOR LATER
       |

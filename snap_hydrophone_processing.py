@@ -85,9 +85,9 @@ for file_name in sorted(wav_files):
 
      # Step 2: RMS level
     # --- Squares all values, takes mean + sqrt, then converts to dB. ---
-    hydrophone_sensitivity_db = -170 # TO BE CHANGED with actual hydrophone sensitivity
+    hydrophone_sensitivity_db = -170 # dBV/μPa (Volts: V)
     rms_level = np.sqrt(np.mean(filtered_data**2))
-    overall_level_db = 20 * np.log10(rms_level + np.finfo(float).eps) - hydrophone_sensitivity_db
+    overall_level_db = 20 * np.log10(rms_level + np.finfo(float).eps) + hydrophone_sensitivity_db # Check this ---
     overall_levels_db.append(overall_level_db)
     file_level_time_list.append(timestamp)
     print(f"Overall 1–20 kHz level: {overall_level_db:.2f} dB re 1 µPa")
@@ -106,7 +106,7 @@ for file_name in sorted(wav_files):
         f, psd = welch(segment, fs=fs, nperseg=nperseg, noverlap=noverlap, scaling='density')
 
         # Convert PSD to dB and apply hydrophone sensitivity
-        psd_db = 10 * np.log10(psd + np.finfo(float).eps) - hydrophone_sensitivity_db
+        psd_db = 10 * np.log10(psd + np.finfo(float).eps) + hydrophone_sensitivity_db # Check this ---
 
          # Initialize freq_mask and f_kHz only once
         if freq_mask is None:
