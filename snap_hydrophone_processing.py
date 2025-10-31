@@ -7,7 +7,7 @@ from datetime import datetime, timezone, timedelta
 import matplotlib.dates as mdates
 
 # -------- USER SETTINGS -------- #
-wav_folder = r"D:\SWIFT12_hydrophone\2024-10\output_segments"  # Path to folder with .wav files
+wav_folder = r"D:\Initial run 10-25\output_segments"  # Path to folder with .wav files
 lowcut = 1000    # 1 kHz
 highcut = 20000  # 20 kHz
 filter_order = 4  # Butterworth filter order
@@ -17,7 +17,7 @@ nperseg = 2048
 noverlap = nperseg // 2
 # --------------------------------
 
-save_path = r"D:\SWIFT12_hydrophone\2024-10\ProcessedResults"
+save_path = r"C:\Users\Felic\Documents\HydroPhone\Output data"
 os.makedirs(save_path, exist_ok=True)
 
 # Finds the WAV files
@@ -25,7 +25,7 @@ wav_files = [f for f in os.listdir(wav_folder) if f.lower().endswith(".wav")]
 if not wav_files:
     raise FileNotFoundError(f"No .wav files found in {wav_folder}")
 
-# Initialize varibles
+# Initialize variables
 f = None
 freq_mask = None
 f_kHz = None

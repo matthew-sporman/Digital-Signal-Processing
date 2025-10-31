@@ -6,9 +6,10 @@ import wave
 import glob
 
 def parse_start_time(filename: str) -> datetime:
-    """Extract date and time from wav filename like 20241029T150409_4266917927872453_2.0.wav"""
-    base = os.path.basename(filename).split("_")[0]  # "20241029T150409"
-    return datetime.strptime(base, "%Y%m%dT%H%M%S")
+    base = os.path.splitext(os.path.basename(filename))[0]  # removes .WAV
+    timestamp_str = base.split("_")[0]  # gets "20241029T150409"
+    return datetime.strptime(timestamp_str, "%Y%m%dT%H%M%S")
+
 
 def get_wav_duration(filepath: str) -> float:
     """Return duration (seconds) of a .wav file."""
@@ -91,8 +92,8 @@ def batch_split(files, segment_minutes, outdir="segments"):
 
 if __name__ == "__main__":
 
-    wav_folder = r"D:\SWIFT12_hydrophone\2024-10"
+    wav_folder = r"D:\Initial run 10-25"
     files = sorted(glob.glob(os.path.join(wav_folder, "*.wav")))
 
-    outdir = r"D:\SWIFT12_hydrophone\2024-10\output_segments"
-    batch_split(files, segment_minutes=12, outdir=outdir)
+    outdir = r"D:\Initial run 10-25\output_segments"
+    batch_split(files, segment_minutes=60, outdir=outdir)
