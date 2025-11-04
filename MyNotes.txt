@@ -1,27 +1,24 @@
-Week of 09/22:
-Here's the things we want to do with this data:
+Week of 11/3:
 
-1. Have a script we can give timedate strings to and have it segment out (possibly combining) a chunk every N minutes (plan on 12, but it might change) from the .wav files.
+Splitting: 
+Hydrophone data may need to be synchronized with meteorlogical data (OFFSET)!!! Implement this
 
---------------------------------------------------------------------------------------------------------------------
+--> Implement stdin and stdout for wav_split and snap_hydrophone_processing. 
 
-2. Process out some signal statistics. I'll add to this later
+--> Featurize the spectrogram plots for machine learning use. (Make them be convertable to PNGs... etc)
 
-2a. Spectrum - 
+--> Get with Evan on checking the calculations of dB; some calculations seem off.
 
-2b. Overall levels - 
+Implement this:
+- Ambient levels at: 
+ - 1.5 kHz
+ - 7.5 kHz
+ - 15 kHz
 
-2c. Filtered levels - match the paper
+ Address data sizing issue likely normalization calculations failing because of large array allocation:
 
---------------------------------------------------------------------------------------------------------------------
-
-3. Load the other parameters we see in the below .png and try to correlate things with the spectra
-
---------------------------------------------------------------------------------------------------------------------
-
-Here's the github for the SWIFT buoy processing, linked to the hydrophone part (It's in MATLAB!): 
-https://github.com/SASlabgroup/SWIFT-codes/tree/master/Hydrophone
-
+Output:
+numpy.core._exceptions.MemoryError: Unable to allocate 16.3 GiB for an array with shape (547421756, 4) and data type float64
 
 -------------------------------------------------------------------------------------------------------------------
 Week of 09/29:
@@ -47,7 +44,6 @@ should be same as; https://github.com/SASlabgroup/SWIFT-codes/blob/master/Hydrop
 check sample rate, might be 96 kHz, should be available when you load the wav file.
 
 --------------------------------------------------------------------------------------------------------------------
-
 Important things to compute:
 
 - 1-20 kHz overall level
@@ -77,66 +73,5 @@ We should update nperseg and noverlap. Keep noverlap at nperseg/2. Try some diff
 
 Reference for windowing: https://download.ni.com/evaluation/pxi/Understanding%20FFTs%20and%20Windowing.pdf
 
---------------------------------------------------------------------------------------------------------------------
-Week of 11/3
-
-
-Splitting: 
-Hydrophone data may need to be synchronized with meteorlogical data (OFFSET)!!! Implement this
-
---> Implement stdin and stdout for wav_split and snap_hydrophone_processing. 
-
---> Featurize the spectrogram plots for machine learning use. (Make them be convertable to PNGs... etc)
-
---> Get with Evan on checking the calculations of dB; some calculations seem off.
-
-Implement this:
-- Ambient levels at: 
- - 1.5 kHz
- - 7.5 kHz
- - 15 kHz
-
- Address data sizing issue:
-
-Output: 
-PSD shape: (811, 674996) (freq x time)
-Traceback (most recent call last):
-  File "snap_hydrophone_processing.py", line 157, in <module>
-    plt.savefig(os.path.join(save_path, "spectrogram.png"), dpi=200)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\pyplot.py", line 859, in savefig
-    res = fig.savefig(*args, **kwargs)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\figure.py", line 2311, in savefig
-    self.canvas.print_figure(fname, **kwargs)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\backend_bases.py", line 2217, in print_figure
-    **kwargs)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\backend_bases.py", line 1639, in wrapper
-    return func(*args, **kwargs)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\backends\backend_agg.py", line 509, in print_png
-    FigureCanvasAgg.draw(self)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\backends\backend_agg.py", line 407, in draw
-    self.figure.draw(self.renderer)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\artist.py", line 41, in draw_wrapper
-    return draw(artist, renderer, *args, **kwargs)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\figure.py", line 1864, in draw
-    renderer, self, artists, self.suppressComposite)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\image.py", line 131, in _draw_list_compositing_images
-    a.draw(renderer)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\artist.py", line 41, in draw_wrapper
-    return draw(artist, renderer, *args, **kwargs)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\cbook\deprecation.py", line 411, in wrapper
-    return func(*inner_args, **inner_kwargs)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\axes\_base.py", line 2747, in draw
-    mimage._draw_list_compositing_images(renderer, self, artists)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\image.py", line 131, in _draw_list_compositing_images
-    a.draw(renderer)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\artist.py", line 41, in draw_wrapper
-    return draw(artist, renderer, *args, **kwargs)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\collections.py", line 2024, in draw
-    self.update_scalarmappable()
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\collections.py", line 855, in update_scalarmappable
-    self._facecolors = self.to_rgba(self._A, self._alpha)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\cm.py", line 333, in to_rgba
-    rgba = self.cmap(x, alpha=alpha, bytes=bytes)
-  File "C:\Users\Felic\miniconda3\envs\py36env\lib\site-packages\matplotlib\colors.py", line 610, in __call__
-    rgba = lut[xa]
-numpy.core._exceptions.MemoryError: Unable to allocate 16.3 GiB for an array with shape (547421756, 4) and data type float64
+-------------------------------------------------------------------------------------------------------------------
+Week of 09/22: https://github.com/SASlabgroup/SWIFT-codes/tree/master/Hydrophone
