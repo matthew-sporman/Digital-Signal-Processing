@@ -2,14 +2,15 @@ import os
 import subprocess
 import sys
 # ==========================================================
-# GLOBAL CONSTANTS
+# Calibration level for the hydrophone
 FS_CALIBRATION_LEVEL = 170.0 
+
 # ==========================================================
-# 1. USER SETTINGS: DEFINE YOUR PATHS AND PARAMETERS HERE.
+# 1. USER SETTINGS: DEFINE YOUR PATHS AND PARAMETERS BELOW.
 # ==========================================================
 
-# 1. The folder with your GIGANTIC, RAW audio files
-# CHANGE THIS TO YOUR SOURCE FOLDER (e.g., E:\HydrophoneData\Raw)
+# 1. The folder with your RAW audio files
+# CHANGE THIS TO YOUR SOURCE FOLDER (e.g., C:\HydrophoneData\Raw)
 RAW_AUDIO_DIR = r"D:\SWIFT_TESTING"
 
 # 2. The folder WHERE YOU WANT the segmented files to go
@@ -19,19 +20,20 @@ SEGMENT_DIR = r"D:\SWIFT_TESTING\output_segments"
 # 3. The folder WHERE YOU WANT the final analysis (plots, .npz) to go
 ANALYSIS_DIR = r"D:\SWIFT_TESTING\output_charts"
 
-# --- Optional: Splitter Parameters ---
+# --- Splitter Parameters ---
 # The duration of each segment in minutes
 SEGMENT_MINUTES = 12
 
-# --- Optional: Processing Parameters ---
+# --- Processing Parameters ---
 # Frequency range for filtering and plotting (Hz)
 LOWCUT = 1000.0
 HIGHCUT = 20000.0
-# Segment size for Welch's method (FFT size)
+
+# Segment size for Welch (FFT size)
 NPERSEG = 2048
 
 # ==========================================================
-# 2. PIPELINE EXECUTION LOGIC (NO CHANGES NEEDED BELOW)
+# 2. PIPELINE EXECUTION LOGIC (NO CHANGES NEEDED BELOW!)
 # ==========================================================
 
 def run_command(command, step_name):
