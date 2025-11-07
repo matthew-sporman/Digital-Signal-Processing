@@ -1,7 +1,6 @@
-Week of 11/3:
+Week of 11/10:
 
-Splitting: 
-Hydrophone data may need to be synchronized with meteorlogical data (OFFSET)!!! Implement this
+--> Hydrophone data may need to be synchronized with meteorological data (OFFSET) Implement this
 
 --> Implement stdin and stdout for wav_split and snap_hydrophone_processing. (DONE)
 
@@ -9,15 +8,14 @@ Hydrophone data may need to be synchronized with meteorlogical data (OFFSET)!!! 
 
 --> Get with Evan on checking the calculations of dB; some calculations seem off.
 
-Implement this:
-- Ambient levels at: 
- - 1.5 kHz
- - 7.5 kHz
- - 15 kHz
+--> Duty cycling functionality added to wav_split.
 
- Address data sizing issue likely normalization calculations failing because of large array allocation:
+--> Ambient levels at: 
+          - 1.5 kHz
+          - 7.5 kHz
+          -  15 kHz
 
-Output:
+ Address data sizing issue likely normalization calculations failing because of large array allocation (RAM?):
 numpy.core._exceptions.MemoryError: Unable to allocate 16.3 GiB for an array with shape (547421756, 4) and data type float64
 
 -------------------------------------------------------------------------------------------------------------------
