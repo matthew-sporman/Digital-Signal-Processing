@@ -4,6 +4,7 @@ import numpy as np
 from scipy.io import wavfile
 import wave
 import glob
+import argparse
 
 def parse_start_time(filename: str) -> datetime:
     base = os.path.splitext(os.path.basename(filename))[0]  # removes .WAV
@@ -83,7 +84,7 @@ def batch_split(files, segment_minutes, outdir="segments"):
             timestamp_str = current_start.strftime("%Y%m%dT%H%M%S")
             outname = os.path.join(outdir, f"{timestamp_str}.wav")
             wavfile.write(outname, sample_rate, segment_data)
-            print(f"Saved {outname} : {current_start} → {current_end}")
+            print(f"Saved {outname} : {current_start} -> {current_end}")
 
         # Move to next chunk
         current_start += segment_delta
@@ -91,9 +92,29 @@ def batch_split(files, segment_minutes, outdir="segments"):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Split raw WAV files into fixed-length segments.")
+    
+    parser.add_argument("-i", "--input-dir", 
+                        required=True, 
+                        help="Folder containing the raw .wav files")
+                        
+    parser.add_argument("-o", "--output-dir", 
+                        required=True, 
+                        help="Folder to save the segmented .wav files")
+                        
+    parser.add_argument("-m", "--minutes", 
+                        type=int, 
+                        default=60, 
+                        help="The duration of each segment in minutes (default: 60)")
+    
+    args = parser.parse_args()
 
-    wav_folder = r"D:\Initial run 10-25"
-    files = sorted(glob.glob(os.path.join(wav_folder, "*.wav")))
-
-    outdir = r"D:\Initial run 10-25\output_segments"
-    batch_split(files, segment_minutes=60, outdir=outdir)
+    # --- Run the logic ---
+    files = sorted(glob.glob(os.path.join(args.input_dir, "*.wav")))
+    
+    if not files:
+        print(f"Error: No .wav files found in {args.input_dir}")
+    else:
+        print(f"Found {len(files)} files. Starting split...")
+        batch_split(files, segment_minutes=args.minutes, outdir=args.output_dir)
+        print(f"\n Splitting complete. Segments saved to: {args.output_dir}")

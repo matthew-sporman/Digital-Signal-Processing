@@ -3,7 +3,7 @@ Week of 11/3:
 Splitting: 
 Hydrophone data may need to be synchronized with meteorlogical data (OFFSET)!!! Implement this
 
---> Implement stdin and stdout for wav_split and snap_hydrophone_processing. 
+--> Implement stdin and stdout for wav_split and snap_hydrophone_processing. (DONE)
 
 --> Featurize the spectrogram plots for machine learning use. (Make them be convertable to PNGs... etc)
 
