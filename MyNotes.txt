@@ -1,5 +1,11 @@
 Week of 11/10:
 
+---> Please try to query TEMPEST via API (.env) at some point. 
+
+For running YOLO, I have a couple edge GPUS (NVIDIA Jetson Nano and Orin AGX) that we could try using for a standalone device if you thought that was interesting.
+The better solution is probably a script that checks the latest webcam footage and runs on one of our lab workstations, but it could be an interesting side project.
+You wouldn't need a login to use the API, but you'll need the personal access token and the station/device ID.
+
 --> Hydrophone data may need to be synchronized with meteorological data (OFFSET) Implement this
 
 --> Implement stdin and stdout for wav_split and snap_hydrophone_processing. (DONE)
