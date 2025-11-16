@@ -1,6 +1,11 @@
 Week of 11/10:
 
----> Please try to query TEMPEST via API (.env) at some point. 
+---> Please try to query TEMPEST via API (.env) at some point.
+Curl: "https://swd.weatherflow.com/swd/rest/observations/station/[your_station_id]?token=[your_access_token]"
+Station is 82486
+Key you should already have
+
+Here's some info about the Audiomoth sensitivity which relates to the gain: https://bioacoustics.stackexchange.com/questions/558/what-is-the-audiomoth-absolute-sensitivity-in-v-pa?rq=1
 
 For running YOLO, I have a couple edge GPUS (NVIDIA Jetson Nano and Orin AGX) that we could try using for a standalone device if you thought that was interesting.
 The better solution is probably a script that checks the latest webcam footage and runs on one of our lab workstations, but it could be an interesting side project.
