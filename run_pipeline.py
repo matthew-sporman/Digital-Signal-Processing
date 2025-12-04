@@ -20,7 +20,7 @@ ANALYSIS_DIR = r"D:\SWIFT_TESTING\output_charts"
 WEATHER_DIR = os.path.join(ANALYSIS_DIR, "weather_data_JSON")
 
 # --- Splitter Parameters ---
-SEGMENT_MINUTES = 1
+SEGMENT_MINUTES = 12
 
 # --- Processing Parameters ---
 LOWCUT = 1000.0
