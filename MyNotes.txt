@@ -1,9 +1,11 @@
-Week of 11/10:
+Week of 12/8:
 
+-------------------------------------------------------------------------------------------------------------------
+Week of 11/10:
 ---> Please try to query TEMPEST via API (.env) at some point.
 Curl: "https://swd.weatherflow.com/swd/rest/observations/station/[your_station_id]?token=[your_access_token]"
 Station is 82486
-Key you should already have
+Key you should already have (DONE)
 
 Here's some info about the Audiomoth sensitivity which relates to the gain: https://bioacoustics.stackexchange.com/questions/558/what-is-the-audiomoth-absolute-sensitivity-in-v-pa?rq=1
 
@@ -11,7 +13,7 @@ For running YOLO, I have a couple edge GPUS (NVIDIA Jetson Nano and Orin AGX) th
 The better solution is probably a script that checks the latest webcam footage and runs on one of our lab workstations, but it could be an interesting side project.
 You wouldn't need a login to use the API, but you'll need the personal access token and the station/device ID.
 
---> Hydrophone data may need to be synchronized with meteorological data (OFFSET) Implement this
+--> Hydrophone data may need to be synchronized with meteorological data; Offset needs to be a synchronization feature. (DONE)
 
 --> Implement stdin and stdout for wav_split and snap_hydrophone_processing. (DONE)
 
@@ -19,7 +21,7 @@ You wouldn't need a login to use the API, but you'll need the personal access to
 
 --> Get with Evan on checking the calculations of dB; some calculations seem off.
 
---> Duty cycling functionality added to wav_split.
+--> Duty cycling functionality added to wav_split. (DONE)
 
 --> Ambient levels at: 
           - 1.5 kHz

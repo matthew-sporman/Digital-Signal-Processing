@@ -1,0 +1,9 @@
+name: Digital-Signal-Processing
+channels:
+  - defaults
+dependencies:
+  - python>=3.10
+  - numpy
+  - scipy
+  - matplotlib
+  - requests
