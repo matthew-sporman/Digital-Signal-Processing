@@ -1,0 +1,7 @@
+{
+    "tempest_api_token": "PASTE_YOUR_ACCESS_TOKEN_HERE",
+    "station_id": "82486",
+    "tempest_device_id": "PASTE_YOUR_SENSOR_DEVICE_ID_HERE"
+}
+
+Kept 82486 since GLRC is primary station
