@@ -12,9 +12,9 @@ FS_CALIBRATION_LEVEL = 170.0
 # 1. USER SETTINGS
 # ==========================================================
 
-RAW_AUDIO_DIR = r"D:\SWIFT_TESTING"
-SEGMENT_DIR = r"D:\SWIFT_TESTING\output_segments"
-ANALYSIS_DIR = r"D:\SWIFT_TESTING\output_charts"
+RAW_AUDIO_DIR = r"D:\Hydromoth_Data"
+SEGMENT_DIR = r"D:\Hydromoth_Data\output_segments"
+ANALYSIS_DIR = r"D:\Hydromoth_Data\output_charts"
 
 # --- New: Weather Output Folder ---
 WEATHER_DIR = os.path.join(ANALYSIS_DIR, "weather_data_JSON")

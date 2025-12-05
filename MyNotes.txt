@@ -1,4 +1,76 @@
+-------------------------------------------------------------------------------------------------------------------
 Week of 12/8:
+
+--> Georgia Tech Masters CS Program Look into this.
+
+--> Fix the massive array size allocation issue:  
+plt.savefig(os.path.join(save_path, "spectrogram.png"), dpi=200)
+issue is with line above. We have to do something about the time array size to shrink it for this figure to save.
+
+Stack Trace:
+Saved processed data to D:\Hydromoth_Data\output_charts\SNAPhydrophonespectra_fft.npz
+
+STDERR: Traceback (most recent call last):
+  File "C:\Users\matth\OneDrive\Documents\GitHub\Digital-Signal-Processing\snap_hydrophone_processing.py", line 198, in <module>
+    main(wav_folder=args.input_dir,
+  File "C:\Users\matth\OneDrive\Documents\GitHub\Digital-Signal-Processing\snap_hydrophone_processing.py", line 142, in main
+    plt.savefig(os.path.join(save_path, "spectrogram.png"), dpi=200)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\pyplot.py", line 1251, in savefig
+    res = fig.savefig(*args, **kwargs)  # type: ignore[func-returns-value]
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\figure.py", line 3490, in savefig
+    self.canvas.print_figure(fname, **kwargs)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\backends\backend_qtagg.py", line 75, in print_figure
+    super().print_figure(*args, **kwargs)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\backend_bases.py", line 2157, in print_figure  
+    self.figure.draw(renderer)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\artist.py", line 94, in draw_wrapper
+    result = draw(artist, renderer, *args, **kwargs)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\artist.py", line 71, in draw_wrapper
+    return draw(artist, renderer)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\figure.py", line 3257, in draw
+    mimage._draw_list_compositing_images(
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\image.py", line 134, in _draw_list_compositing_images
+    a.draw(renderer)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\artist.py", line 71, in draw_wrapper
+    return draw(artist, renderer)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\axes\_base.py", line 3226, in draw
+    mimage._draw_list_compositing_images(
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\image.py", line 134, in _draw_list_compositing_images
+    a.draw(renderer)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\artist.py", line 71, in draw_wrapper
+    return draw(artist, renderer)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\collections.py", line 2423, in draw
+    self.update_scalarmappable()
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\collections.py", line 923, in update_scalarmappable
+    self._mapped_colors = self.to_rgba(self._A, self._alpha)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\colorizer.py", line 367, in to_rgba
+    return self._colorizer.to_rgba(x, alpha=alpha, bytes=bytes, norm=norm)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\colorizer.py", line 158, in to_rgba
+    rgba = self.cmap(x, alpha=alpha, bytes=bytes)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\colors.py", line 740, in __call__
+    rgba, mask = self._get_rgba_and_mask(X, alpha=alpha, bytes=bytes)
+  File "C:\ProgramData\miniconda3\envs\Digital-Signal-Processing\lib\site-packages\matplotlib\colors.py", line 798, in _get_rgba_and_mask    
+    rgba = lut.take(xa, axis=0, mode='clip')
+numpy._core._exceptions._ArrayMemoryError: Unable to allocate 51.4 GiB for an array with shape (811, 2126187, 4) and data type float64 
+
+--> "D:\SWIFT12_2024Oct27-31_HLY2403(1).zip"
+    Load .mat files using python for getting weather observations from arctic buoys up by Alaska.
+
+--> Featurize the spectrogram plots for machine learning use. (Make them be convertable to PNGs... etc)
+
+--> Synchronization of weather to observations ("this is the weather at the same time as this point in the spectrogram)
+
+--> Event-based flags; If we have an object detection model, we can say "there's a ship" going by at some specific point in time.
+    this will lead into the machine learning portion of the project later.
+
+--> Get with Evan on checking the calculations of dB; some calculations seem off.
+
+--> Ambient levels at: 
+          - 1.5 kHz
+          - 7.5 kHz
+          -  15 kHz
+
+--> (Octave?) band anaylsis
 
 -------------------------------------------------------------------------------------------------------------------
 Week of 11/10:
@@ -17,16 +89,7 @@ You wouldn't need a login to use the API, but you'll need the personal access to
 
 --> Implement stdin and stdout for wav_split and snap_hydrophone_processing. (DONE)
 
---> Featurize the spectrogram plots for machine learning use. (Make them be convertable to PNGs... etc)
-
---> Get with Evan on checking the calculations of dB; some calculations seem off.
-
 --> Duty cycling functionality added to wav_split. (DONE)
-
---> Ambient levels at: 
-          - 1.5 kHz
-          - 7.5 kHz
-          -  15 kHz
 
  Address data sizing issue likely normalization calculations failing because of large array allocation (RAM?):
 numpy.core._exceptions.MemoryError: Unable to allocate 16.3 GiB for an array with shape (547421756, 4) and data type float64
