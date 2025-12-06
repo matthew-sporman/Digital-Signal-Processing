@@ -1,7 +1,9 @@
 -------------------------------------------------------------------------------------------------------------------
 Week of 12/8:
 
---> Georgia Tech Masters CS Program Look into this.
+--> https://acousticalsociety.org
+
+--> JSON formatting reference for Tempest API: https://apidocs.tempestwx.com/reference/observation-record-format
 
 --> Fix the massive array size allocation issue:  
 plt.savefig(os.path.join(save_path, "spectrogram.png"), dpi=200)
