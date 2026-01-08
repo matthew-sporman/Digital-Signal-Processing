@@ -1,6 +1,7 @@
 Week of 1/5/26:
 
---> If you need any direction, I'd say try to open the .nc or .mat files and process the audio files at time steps that match the meteorological data there, then save the spectrums and levels to some kind of file (.csv or whatever) and maybe try doing some figures comparing wind speed or wave height to the audio levels. 
+--> If you need any direction, I'd say try to open the .nc or .mat files and process the audio files at time steps that match the meteorological data there,
+then save the spectrums and levels to some kind of file (.csv or whatever) and maybe try doing some figures comparing wind speed or wave height to the audio levels. 
 -------------------------------------------------------------------------------------------------------------------
 Week of 12/8:
 
