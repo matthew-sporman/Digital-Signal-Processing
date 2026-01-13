@@ -9,7 +9,7 @@ Week of 12/8:
 
 --> JSON formatting reference for Tempest API: https://apidocs.tempestwx.com/reference/observation-record-format
 
---> Fix the massive array size allocation issue:  
+--> (DONE) Fix the massive array size allocation issue:  
 plt.savefig(os.path.join(save_path, "spectrogram.png"), dpi=200)
 issue is with line above. We have to do something about the time array size to shrink it for this figure to save.
 
@@ -62,11 +62,11 @@ numpy._core._exceptions._ArrayMemoryError: Unable to allocate 51.4 GiB for an ar
 --> "D:\SWIFT12_2024Oct27-31_HLY2403(1).zip"
     Load .mat files using python for getting weather observations from arctic buoys up by Alaska.
 
---> Featurize the spectrogram plots for machine learning use. (Make them be convertable to PNGs... etc)
+--> (DONE) Featurize the spectrogram plots for machine learning use. (Make them be convertable to PNGs... etc)
 
 --> Synchronization of weather to observations ("this is the weather at the same time as this point in the spectrogram)
 
---> Event-based flags; If we have an object detection model, we can say "there's a ship" going by at some specific point in time.
+--> (DONE) Event-based flags; If we have an object detection model, we can say "there's a ship" going by at some specific point in time.
     this will lead into the machine learning portion of the project later.
 
 --> Get with Evan on checking the calculations of dB; some calculations seem off.
